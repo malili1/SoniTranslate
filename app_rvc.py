@@ -1135,7 +1135,7 @@ class SoniTranslate(SoniTrCache):
             # Merge new audio + video
             remove_files(video_output_file)
             run_command(
-                f"ffmpeg -i {base_video_file} -i {mix_audio_file} -c:v copy -c:a copy -map 0:v -map 1:a -shortest {video_output_file}"
+                f"ffmpeg -i {base_video_file} -i {mix_audio_file} -c:v copy -c:a aac -b:a 192k -map 0:v -map 1:a -shortest {video_output_file}"
             )
 
         output = media_out(
