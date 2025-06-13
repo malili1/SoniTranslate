@@ -269,10 +269,21 @@ def call_gpt_translate(
 
 def gpt_sequential(segments, model, target, source=None):
     from openai import OpenAI
+    import httpx # <-- [PERUBAHAN 1] Impor pustaka httpx
 
     translated_segments = copy.deepcopy(segments)
+    
+    # ----- [PERUBAHAN 2] Inisialisasi Klien OpenAI dengan Penanganan Proxy -----
+    # Ini adalah cara baru untuk mengatur proxy sesuai dokumentasi openai > v1.0.0
+    # Jika Anda tidak menggunakan proxy, Anda bisa membiarkan baris `client = OpenAI()` saja.
+    # Jika Anda butuh proxy, hapus komentar pada dua baris di bawah ini dan isi URL proxy Anda.
+    # http_client = httpx.Client(proxies="http://user:pass@host:port")
+    # client = OpenAI(http_client=http_client)
 
+    # Untuk sekarang, kita akan menggunakan inisialisasi standar tanpa proxy.
     client = OpenAI()
+    # ------------------- AKHIR BAGIAN PERUBAHAN -------------------
+
     progress_bar = tqdm(total=len(segments), desc="Translating")
 
     lang_tg = re.sub(r'\([^)]*\)', '', INVERTED_LANGUAGES[target]).strip()
@@ -321,12 +332,23 @@ def gpt_sequential(segments, model, target, source=None):
 def gpt_batch(segments, model, target, token_batch_limit=900, source=None):
     from openai import OpenAI
     import tiktoken
+    import httpx # <-- [PERUBAHAN 1] Impor pustaka httpx
 
     token_batch_limit = max(100, (token_batch_limit - 40) // 2)
     progress_bar = tqdm(total=len(segments), desc="Translating")
     segments_copy = copy.deepcopy(segments)
     encoding = tiktoken.get_encoding("cl100k_base")
+    
+    # ----- [PERUBAHAN 2] Inisialisasi Klien OpenAI dengan Penanganan Proxy -----
+    # Sama seperti di fungsi sebelumnya, ini adalah cara baru untuk mengatur proxy.
+    # Jika Anda tidak menggunakan proxy, Anda bisa membiarkan baris `client = OpenAI()` saja.
+    # Jika Anda butuh proxy, hapus komentar pada dua baris di bawah ini dan isi URL proxy Anda.
+    # http_client = httpx.Client(proxies="http://user:pass@host:port")
+    # client = OpenAI(http_client=http_client)
+
+    # Untuk sekarang, kita akan menggunakan inisialisasi standar tanpa proxy.
     client = OpenAI()
+    # ------------------- AKHIR BAGIAN PERUBAHAN -------------------
 
     lang_tg = re.sub(r'\([^)]*\)', '', INVERTED_LANGUAGES[target]).strip()
     lang_sc = ""
